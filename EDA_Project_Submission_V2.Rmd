@@ -1,0 +1,666 @@
+WineQualityReds by Katrin Haller
+========================================================
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+# load libraries
+library(ggplot2)
+library(knitr)
+library(dplyr)
+library(gridExtra)
+library(corrplot)
+library(reshape2)
+```
+
+
+```{r echo=FALSE, Load_the_Data}
+# read in the dataset
+RedWineQuality <- read.csv('wineQualityReds.csv')
+```
+
+
+# Short Introduction
+
+In this Exploratory Data Analysis (EDA) I will explore a dataset about the quality of red wine. This dataset contains 13 variables and 1599 observations. There are informations about the quality level, different acids/ acidity, residual sugar, alcohol, density and pH level. 
+
+
+# Univariate Plots Section
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots}
+# names of the 13 variables in the dataset
+names(RedWineQuality)
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# structure of the dataset
+str(RedWineQuality)
+```
+
+In the two plots above we can see the 13 variables as well as the structure of our dataset. 
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# first 6 rows of the dataset
+head(RedWineQuality)
+```
+
+This plot shows the first 6 rows (default) of the table, so I can get familiar with the values and columns.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# summary of the main statistics of the dataset
+summary(RedWineQuality)
+```
+
+The plot above is the statistical summary of the dataset and gives a better idea of the values the variables here can take on. You can see that the mean quality is 5.6 and has a range from 3.0 to 8.0. The alcohol level has a mean of 10.42, a mean pH level of 3.3 and a mean of volatile acidity of 0.5.
+
+
+### Plot 1 & Plot 2
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# distribution of variables 
+p1 = qplot(x = fixed.acidity, data = RedWineQuality, 
+           binwidth = 0.1) 
+p2 = qplot(x = volatile.acidity, data = RedWineQuality, 
+           binwidth = 0.02)
+# to show both plots
+
+grid.arrange(p1, p2, ncol = 2)
+```
+
+Both plots look a little right skewed, so it would be a good idea to transform the data with log10.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# distribution of variables 
+p1_log10 = qplot(x = fixed.acidity, data = RedWineQuality, 
+                 binwidth = 0.01) + scale_x_log10()
+p2_log10 = qplot(x = volatile.acidity, data = RedWineQuality, 
+                 binwidth = 0.02) + scale_x_log10()
+#to show both plots
+grid.arrange(p1_log10, p2_log10, ncol = 2)
+```
+
+Now we have a normal distribution with base log10.
+
+
+### Plot 3 & Plot 4
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# distribution of variables 
+p3 = qplot(x = citric.acid, data = RedWineQuality, 
+           binwidth = 0.02)
+p4 = qplot(x = residual.sugar, data = RedWineQuality, 
+           binwidth = 0.2)
+# to show both plots
+grid.arrange(p3, p4, ncol = 2)
+```
+
+These plots for citric.acid and residual.sugar look also very right skewed, so I will transform the data like above with log10.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# distribution of variables 
+p3_log10 = qplot(x = citric.acid, data = RedWineQuality, 
+                 binwidth = 0.04) + scale_x_log10()
+p4_log10 = qplot(x = residual.sugar, data = RedWineQuality, 
+                 binwidth = 0.02) + scale_x_log10()
+# to show both plots
+grid.arrange(p3_log10, p4_log10, ncol = 2)
+```
+
+These are the plots p3 and p4 as a normal distribution.
+
+
+### Plot 5 & Plot 6
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# distribution of variables 
+p5 = qplot(x = free.sulfur.dioxide, data = RedWineQuality, 
+           binwidth = 1.2)
+p6 = qplot(x = total.sulfur.dioxide, data = RedWineQuality, 
+           binwidth = 2.5)
+# to show both plots
+grid.arrange(p5, p6, ncol = 2)
+```
+
+As observed in the plots p1 to p4, these two plots are right skewed too and has to be transformed with log10.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# distribution of variables 
+p5_log10 = qplot(x = free.sulfur.dioxide, data = RedWineQuality, 
+                 binwidth = 0.04) + scale_x_log10()
+p6_log10 = qplot(x = total.sulfur.dioxide, data = RedWineQuality, 
+                 binwidth = 0.04) + scale_x_log10()
+# to show both plots
+grid.arrange(p5_log10, p6_log10, ncol = 2)
+```
+
+Now we have a normal distribution for both sulfur dioxid values.
+
+
+### Plot 7 & Plot 8
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# distribution of variables 
+p7 = qplot(x = density, data = RedWineQuality, 
+           binwidth = 0.0003)
+p8 = qplot(x = pH, data = RedWineQuality, 
+           binwidth = 0.02)
+# to show both plots
+grid.arrange(p7, p8, ncol = 2)
+```
+
+These plots for density and pH level look both normal distributed, so we don't have to transform them. 
+
+### Plot 9 & Plot 10
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# distribution of variables 
+p9 = qplot(x = chlorides, data = RedWineQuality, 
+           binwidth = 0.02)
+p10 = qplot(x = sulphates, data = RedWineQuality, 
+           binwidth = 0.05)
+# to show both plots
+grid.arrange(p9, p10, ncol = 2)
+```
+
+
+These are the plots for chlorides and sulphates, which are also right skewed.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# distribution of variables 
+p9_log10 = qplot(x = chlorides, data = RedWineQuality, 
+           binwidth = 0.02) + scale_x_log10()
+p10_log10 = qplot(x = sulphates, data = RedWineQuality, 
+           binwidth = 0.05) + scale_x_log10()
+# to show both plots
+grid.arrange(p9_log10, p10_log10, ncol = 2)
+```
+
+Now the plots for chlorides and sulphates are normal distributed.
+
+
+### Plot 11 & Plot 12
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# distribution of variables 
+p11 = qplot(x = alcohol, data = RedWineQuality, 
+           binwidth = 0.2)
+# barchart for quality
+p12 = ggplot(aes(x = factor(quality)), data = RedWineQuality) + geom_bar()
+# to show both plots
+grid.arrange(p11, p12, ncol = 2)
+```
+
+The plot for alcohol looks right skewed so I will transform this with log10.
+
+
+### Create a new variable 'wine_rating'
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# create a new variable out of the variable 'quality'
+RedWineQuality$wine_rating <- ifelse(RedWineQuality$quality <5,  'low',
+                              ifelse(RedWineQuality$quality < 7, 'medium',
+                              'high'))
+
+RedWineQuality$wine_rating <- ordered(RedWineQuality$wine_rating, 
+                              levels = c('low', 'medium', 'high'))
+```
+
+A new variable was created for the rating of wine out of the variable 'quality'.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# the new table, first rows
+head(RedWineQuality)
+```
+
+Here you can see that the new variable 'wine_rating' was created and added to the dataset.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# distribution of variables 
+p9_log10 = qplot(x = alcohol, data = RedWineQuality, 
+                 binwidth = 0.003) + scale_x_log10()
+# to show the variable
+p9_log10
+```
+
+We can observe now that the alcohol level is mostly less than 10 and the range of quality is between 3 and 8 with peaks around 5 and 6.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# distribution of the new variable
+p11 = qplot(x = wine_rating, data = RedWineQuality)
+p11
+```
+
+Here we see the plot for the new variable 'wine_rating', which shows clearly that the most red wines in this dataset were rated medium.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# looking for missing values in the dataset
+sum(is.na(RedWineQuality))
+```
+
+There are no missing values in the dataset.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Plot to find outliers in the variable 'alcohol'
+OutVals = boxplot(RedWineQuality$alcohol)$out
+which(RedWineQuality$alcohol %in% OutVals)
+```
+
+The boxplot shows some outliers in the variable 'alcohol'.
+
+
+# Univariate Analysis
+
+### What is the structure of your dataset?
+The dataset of RedWineQuality has 13 variables with 1599 observations. The variables list diverse chemical compounds of wine like volatile and fixed acidity, citric acid, chlorides, sulfur dioxide, sulphates, alcohol and residual sugar. But the variables also measurements like density, the level of pH and quality of wine. There are no missing values in the dataset.
+
+### What is/are the main feature(s) of interest in your dataset?
+Most interesting in this dataset are the quality of wine compared to the level of alcohol, the pH level with the level of volatile acidity and residual sugar, the sulfur dioxide and eventually the density.
+
+### Did you create any new variables from existing variables in the dataset?
+For a better distribution of the quality of wine I created a new variable called 'wine_rating' from 'quality'. This variable set markers for low, medium and high quality of red wine. In the plot you can clearly see, that the most red wines were rated with medium quality.
+
+### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
+In my first outputs I looked visually at the variables and their values. After this I performed plots for each variable to see the distribution more clearly. For most of the variables I found that they were right skewed, so I transformed these plots with log10 to have a normal distribution. I also found some outliers in volatile.acidity, citric.acid, residual.sugar, free.sulfur.dioxide, total.sulfur.dioxide, pH and alcohol.
+
+
+# Bivariate Plots Section
+
+### Prepare Data for Correlation Matrix
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots}
+# read in the columns needed for correlation
+corrRedWineQuality <- RedWineQuality[, c('volatile.acidity','citric.acid','residual.sugar',
+                                         'free.sulfur.dioxide','density','pH','alcohol','quality')]
+head(corrRedWineQuality)
+```
+
+### Correlation Matrix
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# round the values to 2 numbers
+correlation <- round(cor(corrRedWineQuality),2)
+head(correlation)
+```
+
+Here we have our correlation matrix to see where are the strongest correlations between variables.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+melt_correlation <- melt(correlation)
+head(melt_correlation)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# plot heatmap
+
+corrplot(cor(correlation), type='lower', tl.srt
+         =45, tl.col='orange')
+```
+
+Heatmap of the strongest correlations in the dataset.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# boxplots of relationship between variables
+b1 = qplot(x = quality, y = alcohol, 
+      data = RedWineQuality,
+      geom = "boxplot")
+b2 = qplot(x = quality, y = residual.sugar, 
+      data = RedWineQuality,
+      geom = "boxplot")
+
+grid.arrange(b1, b2, ncol=2)
+```
+
+Here we have the boxplots for quality vs. alcohol and quality vs. residual.sugar.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# scatterplots of relationship between variables
+b1_1 = ggplot(RedWineQuality, aes(x=factor(quality), 
+                    y=alcohol)) + geom_jitter(alpha=
+                    1/8) + geom_boxplot(alpha=1/8, color=
+                    "blue")+stat_summary(fun.y='mean', geom=
+                    'point', color='red')+labs(x='Quality (scores 3 to 8)', y=
+                    'Alcohol (% by volume)') + geom_smooth(method = lm)
+b2_1 = ggplot(RedWineQuality, aes(x=factor(quality), 
+                    y=residual.sugar))+geom_jitter(alpha=
+                    1/8) + geom_boxplot(alpha=1/8, color=
+                    "blue")+stat_summary(fun.y ='mean', geom=
+                    'point', color='red')+labs(x='Quality (scores 3 to 8)', y=
+                    'Residual Sugar (in g/l)') +geom_smooth(method = lm)
+
+grid.arrange(b1_1, b2_1, ncol=2)
+```
+
+
+Here we have the scatterplots for the relationship of the variables in the boxplot above.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# boxplots of relationship between variables
+b3 = qplot(x = pH, y = volatile.acidity, 
+      data = RedWineQuality,
+      geom = "boxplot")
+b4 = qplot(x = residual.sugar, y = pH, 
+      data = RedWineQuality,
+      geom = "boxplot")
+
+grid.arrange(b3, b4, ncol=2)
+```
+
+Here we have the boxplots for pH vs. volatile.acidity and residual.sugar vs. pH.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# scatterplots of relationship between variables
+b3_1 = ggplot(RedWineQuality, aes(x=pH, 
+                   y=volatile.acidity)) + geom_point(alpha=
+                  1/6) +geom_smooth(method = lm)
+b4_1 = ggplot(RedWineQuality, aes(x=residual.sugar, 
+                  y=pH)) + geom_point(alpha=
+                  1/6) + geom_smooth(method = lm)
+
+grid.arrange(b3_1, b4_1, ncol=2)
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# boxplots of relationship between variables
+b5 = qplot(x = residual.sugar, y = volatile.acidity, 
+      data = RedWineQuality,
+      geom = "boxplot")
+b6 = qplot(x = alcohol, y = pH, 
+      data = RedWineQuality,
+      geom = "boxplot")
+
+grid.arrange(b5, b6, ncol=2)
+```
+
+Here we have the boxplots for residual.sugar vs. volatile.acidity and alcohol vs. pH.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# scatterplots of relationship between variables
+b5_1 = ggplot(RedWineQuality, aes(x=volatile.acidity, 
+                      y=residual.sugar)) + geom_point(alpha=
+                      1/6) +geom_smooth(method = lm)
+b6_1 = ggplot(RedWineQuality, aes(x=alcohol, 
+                      y=pH)) + geom_point(alpha=
+                      1/6) + geom_smooth(method = lm)
+
+grid.arrange(b5_1, b6_1, ncol=2)
+```
+
+These are the scatterplots showing the relationship between residual.sugar vs. volatile.acidity and alcohol vs. pH level.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# boxplots of relationship between variables
+b7 = qplot(x = density, y = residual.sugar, 
+      data = RedWineQuality,
+      geom = "boxplot")
+b8 = qplot(x = density, y = citric.acid, 
+      data = RedWineQuality,
+      geom = "boxplot")
+
+grid.arrange(b7, b8, ncol=2)
+```
+
+Here we have the boxplots for density vs. residual.sugar and density vs. 
+citric.acid
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# scatterplots of relationship between variables
+b7_1 = ggplot(RedWineQuality, aes(x=density, 
+                    y=residual.sugar)) + geom_point(alpha=
+                    1/6) + geom_smooth(method = lm)
+b8_1 = ggplot(RedWineQuality, aes(x=citric.acid, 
+                    y=density)) + geom_point(alpha=
+                    1/6) + geom_smooth(method = lm)
+
+grid.arrange(b7_1, b8_1, ncol=2)
+```
+
+These are the scatterplots for density vs. residual.sugar and vs. citric.acid.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# boxplots of relationship between variables
+b9 = qplot(x = free.sulfur.dioxide, y = residual.sugar, 
+      data = RedWineQuality,
+      geom = "boxplot")
+b10 = qplot(x = quality, y = citric.acid, 
+      data = RedWineQuality,
+      geom = "boxplot")
+
+grid.arrange(b9, b10, ncol=2)
+```
+
+Here we see the boxplots for the relationship of residual.sugar vs. free.sulfur.dioxide and for quality vs. citric.acid.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# scatterplots of relationship between variables
+b9_1 = ggplot(RedWineQuality, aes(x=residual.sugar, 
+              y=free.sulfur.dioxide)) + geom_point(alpha=
+              1/6) + geom_smooth(method = lm)
+b10_1 = ggplot(RedWineQuality, aes(x=factor(quality), 
+              y=citric.acid)) + geom_jitter(alpha=
+              1/8)+ geom_boxplot(alpha=1/10, color=
+              'blue')+stat_summary(fun.y='mean', geom=
+              'point', color='red')+labs(x=
+              'Quality (score 3 to 8)', y=
+              'Citric Acid(in g/oz)')+ geom_smooth(method = lm)
+
+grid.arrange(b9_1, b10_1, ncol=2)
+```
+
+These are the proper scatterplot and boxplot for the first boxplots above.
+
+
+### Extra Plot 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# scatterplots of relationship between variables
+b11 = ggplot(RedWineQuality, aes(x=residual.sugar, 
+                  y=citric.acid)) + geom_point(alpha=
+                  1/6) + geom_smooth(method=lm)
+b12 = ggplot(RedWineQuality, aes(x=factor(quality), 
+                  y=volatile.acidity))+geom_jitter(alpha=
+                  1/8)+ geom_boxplot(alpha=1/10, color=
+                  'blue')+stat_summary(fun.y='mean', geom=
+                  'point', color='red')+labs(x=
+                  'Quality (score 3 to 8)', y=
+                  'Volatile Acidity (in g/ml)') + geom_smooth(method=lm)
+
+grid.arrange(b11, b12, ncol=2)
+```
+
+We see a higher level of quality, if we have less volatile.acidity. There are some outliers with a higher level of residual.sugar and also a higher level (>6) of citric.acid - this could be an interesting question for level of quality.
+
+
+# Bivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the investigation. How did the feature(s) of interest vary with other features in the dataset?
+My main interest was for the relationship of the variables (a) density vs. citric.acid or residual.sugar, for (b) pH level vs. volatile.acidity and (c) free.sulfur.dioxide vs. residual.sugar. For (a) density vs. residual.sugar shows for the mean of residual.sugar at 2.5 a strong relationship with the density. This is interesting because the density is determined by the concentration of alcohol and sugar. This plot can be improved in the multivariate plots section. For (a) density vs. citric.acid we have a somewhat strong relationship too. The relationship for (b) pH level vs. volatile.acidity is interesting because it grades the wine for tart and soft wine. In the plot we can observe that the pH level is mostly between 3.0 and 3.5/3.6 and the level of volatile.acidity between 0.2 and 0.8. This plot can also be improved in the multivariate section to see more relationships. The next interesting relationship is between the free.sulfur.dioxide and residual.sugar. In the plot we can see, that at a low level of sugar (less than 4) we have different concentration of free.sulfur.dioxide (between around 5 to 40). The trend shows that for higher level of sugar we have higher values of free.sulfur.dioxide. This chemical compound is important to preserve the flavor after harvest and saves the wine from further fermantation so you can store the wine for many years. 
+
+### Did you observe any interesting relationships between the other features (not the main feature(s) of interest)?
+Yes, in the end I was searching for some interesting insights in other relationships between variables. For the relationsship between the variables residual.sugar vs. citric.acid I found that there are some outliers with a higher level of residual.sugar and also a higher level (>6) of citric.acid. This could be an interesting question for level of quality. I also looked at the relationship of the variables quality vs. volatile.acidity. Here we see a higher level of quality, if we have less volatile.acidity. This might lead to the assumption that some softer wines are rated higher than tart wines.
+
+### What was the strongest relationship you found?
+The strongest relationship from the correlation table is quality vs. alcohol (correlation coefficent of 0.48). This one is closely followed by density vs. citrid.acid (0.36) and density vs. residual.sugar. This is interesting because the density is determined by the concentration of alcohol and sugar, which might be important for the quality and wine_rating.
+
+# Multivariate Plots Section
+
+### Quality, alcohol and sugar
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Multivariate_Plots}
+# scatterplots of relationship between variables
+sc1 = ggplot(RedWineQuality, aes(x=alcohol,y=residual.sugar,colour=
+            factor(quality)))+geom_jitter(alpha=1/3)+coord_cartesian(ylim=
+            c(0,12))+scale_colour_brewer(type='seq')+theme_dark()+labs(x=
+            'Alcohol (% by volume)',y='Residual Sugar (in g/l)',color=
+            "Rating \nQuality of Wine")
+
+sc1
+```
+
+This plot shows the relationship between the variables alcohol, residual.sugar and quality as this is supposed to have the strongest relationship. We see that the quality level tends to be higher with a higher level of alcohol.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+sc2 = ggplot(RedWineQuality,aes(x=alcohol,y=density,colour=
+             factor(quality)))+geom_jitter(alpha=1/3) + coord_cartesian(ylim=
+             c(0.990,1.0))+scale_colour_brewer(type='seq')+theme_dark()+labs(x=
+             'Alcohol (% by volume)',y='Density (in g/cm3)',color=
+             "Rating \nQuality of Wine")
+
+sc2
+```
+
+This plot shows the relationship between alcohol, density and quality. We can observe that with a higher level of alcohol and a low level of residual.sugar we have the lowest level of density.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# scatterplot of relationship between variables
+sc3 = ggplot(RedWineQuality, aes(x=alcohol, 
+             y=residual.sugar,color=
+             factor(wine_rating)))+geom_jitter(alpha=1/3)+coord_cartesian(ylim=
+            c(0,16)) + scale_colour_brewer(type=
+            'seq') + theme_dark() + labs(x='Alcohol (% by volume)', y=                                              'Residual Sugar (in g/l)', color=
+            "Rating \nQuality of Wine")
+
+sc3
+```
+
+This plot shows the quality more clearly, because we used the created variable 'wine_rating'. As you see there are some outliers for medium rating with a lower level of alcohol and a high level of sugar. But mostly the high rated wines have a level of residual.sugar lower than 8, mostly lower than 6 and a level of alcohol betwenn 10 and 14. 
+
+
+### Tart or soft wine?
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# scatterplot of relationship between variables
+sc4 = ggplot(RedWineQuality, aes(x=pH, 
+             y=volatile.acidity, color=
+             factor(wine_rating)))+geom_jitter(alpha=1/3)+coord_cartesian(ylim=
+            c(0,1.6)) + scale_colour_brewer(type=
+            'seq') + theme_dark()+labs(x='pH', y=
+            'Volatile Acidity (in g/ml)', color=
+            "Rating \nQuality of Wine")
+
+sc4
+```
+
+Here we see the highest wine_ratings for pH levels mostly between 3.0 and 3.5 and a volatile.acidity level of less than 0.6. For higher level of volatile.acidity we see a lower wine_rating. 
+
+
+### Quality, sulfur dioxide and sugar
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# scatterplot of relationship between variables
+sc5 = ggplot(RedWineQuality, aes(x=free.sulfur.dioxide, 
+             y=residual.sugar, color=
+             factor(quality))) + geom_jitter(alpha=1/3) + coord_cartesian(ylim=
+            c(0,16)) + scale_colour_brewer(type=
+            'seq') + theme_dark()+labs(x='Free Sulfur Dioxide (in mg/l)', y=
+            'Residual Sugar (in g/l)', color=
+            "Quality of Wine")
+
+sc5
+```
+
+This plot shows the quality for red wines based on the realtionship of residual.sugar and free.sulfur.dioxide.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# scatterplot of relationship between variables
+sc5_1 = ggplot(RedWineQuality, aes(x=free.sulfur.dioxide, 
+            y=residual.sugar, color=
+            factor(wine_rating)))+geom_jitter(alpha=1/3)+coord_cartesian(ylim=
+            c(0,16)) + scale_colour_brewer(type=
+            'seq') + theme_dark()+labs(x='Free Sulfur Dioxide (in mg/l)', y=
+            'Residual Sugar (in g/l)', color=
+            "Rating \nQuality of Wine")
+
+sc5_1
+```
+
+This plot shows two different results. First that with a lower level of residual.sugar and free.sulfur.dioxide the wine_rating is more likely to be high or medium. But there are also values that shows that with a little higher level of residual.sugar but lower level of free.sulfur.dioxide the wine_rating is more likely to be high. We also see some outliers for a lot of residual.sugar and/ or more residual.sugar and high leves of free.sulfur.dioxide having a wine_rating of medium.
+
+
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the investigation. Were there features that strengthened each other in terms of looking at your feature(s) of interest?
+I continued to investigate the relationships I had in the bivariate analysis. In the multivariate analysis I now added a variable, mostly quality or wine_rating to find out, which wines had been highly rated and for what reason. First I looked at the relationship between alcohol, residual.sugar, density and quality, later wine_rating. Most interesting was that the quality level tends to be higher with a higher level of alcohol and a medium level of residual.sugar. Next I took a look at the relationship between volatile.acidity and pH level. This one was really interesting because here you can see if soft or tart wine is rated more highly. In this case wines with a lower volatile.acidity and also only a pH level of 3.0 to 3.5 are preferred. Last I wanted to know more about the rating for the relationship of free.sulfur.dioxide and residual.sugar. Sulfur dioxide is taken for fermantation purposes to get wines which can be stored for years and also for saving the flavor of the grapes after the harvest. I found out that this plot was not so clear since there are two possible directions. One result was that with a lower level of residual.sugar and free.sulfur.dioxide the wine_rating is more likely to be high or medium. And the second result ist that with a little higher level of residual.sugar but lower level of free.sulfur.dioxide the wine_rating is also more likely to be high. 
+
+### Were there any interesting or surprising interactions between features?
+One thing I haven't expected is that residual.sugar doesn't seem to have that much impact on the quality/ wine_rating. I would have also expected that some plots will have a more clear trend in one direction.
+
+------
+
+
+# Final Plots and Summary
+The dataset of RedWineQuality was very interesting to explore. My final plots summarize the relationship for some of the variables with the strongest correlation as well as variables which seems to have an impact on the rating for the quality of wine. The trend is that red wines which have a lower volatile.acidity are more preferred. These wines tend to be more softer and balanced, which is reasonable to me. Usually red wines have a pH level of 3.3-3.6, white wine usually have a pH level of 3.0-3.4. Most of the red wines here have a pH level between 3.0 and 3.5. In combination with the volatile.acidity these wines tend to be more soft. But also with a higher level of alcohol, which then was rated much higher. The rating of the quality of wine was medium with a trend for high.
+
+
+### Plot One
+```{r echo=FALSE, message=FALSE, warning=FALSE, Plot_One}
+# histograms for the distribution of alcohol and residual sugar
+hist1 = qplot(x = alcohol, data = RedWineQuality, 
+              binwidth = 0.003) + geom_histogram(color="grey", fill=
+              "blue") + scale_x_log10(name="Alcohol (% by volume)", breaks=
+              seq(8,15,1))+ggtitle("Distribution of Alcohol")+theme(plot.title=
+              element_text(hjust=0.5))
+
+hist2 = qplot(x = residual.sugar, data = RedWineQuality, 
+          binwidth=0.02) + geom_histogram(color="orange", fill=
+          "brown") + scale_x_log10(name="Residual Sugar (in g/l)", breaks=
+          seq(1,10,1))+ggtitle("Distribution of Residual Sugar")+theme(plot.title=element_text(hjust=0.5))
+
+grid.arrange(hist1, hist2, ncol = 2)
+```
+
+### Description One
+I choose the combination of these two plots because they show the level of alcohol and residual.sugar. The alcohol level seems to be more often lower than 10 or 12 and the level of residual.sugar also shows a lower level which tends to be lower than 4 on a scale of 10.
+
+
+### Plot Two
+```{r echo=FALSE, message=FALSE, warning=FALSE, Plot_Two}
+# scatterplot for the distribution of 2 variables
+sc6 = ggplot(RedWineQuality, aes(x=quality, 
+            y=volatile.acidity))+geom_point(color=
+            "orange", alpha=1/8)+geom_smooth(method=                                    lm)+scale_x_continuous(name="Quality (scores 3 to 8)", breaks=                                                      seq(3,8,1)) + scale_y_continuous(name=                                                                  "Volatile Acidity (in g/ml)") + ggtitle("Volatile Acidity vs. Quality")+theme(plot.title=
+            element_text(hjust = 0.5))
+
+sc6
+```
+
+### Description Two
+
+This plot explains the quality levels for volatile.acidity, which tend to have a higher level of quality for lower level of volatile.acidity. This is interesting because this shows that more balanced wines are preferred.
+
+
+### Plot Three
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Plot_Three}
+# scatterplot for the distribution of 3 variables
+sc7 = ggplot(RedWineQuality, aes(x=pH, y=volatile.acidity, color=
+            factor(wine_rating)))+geom_jitter(alpha=1/3)+coord_cartesian(ylim=
+            c(0,1.6)) +scale_colour_brewer(type='seq')+theme_dark() +labs(x=
+            'pH', y='Volatile Acidity (in g/ml)',color=
+            "Rating \nQuality of Wine")+ggtitle(
+            "Volatile Acidity vs. pH Level") + theme(plot.title = 
+            element_text(hjust = 0.5))
+#hjust=1(right), hjust=0(left)
+
+sc7
+```
+
+### Description Three
+
+Finally, I choose this plot to show the relationship between volatile.acidity and the pH level, because this gives us some information about the kind of wine if it is a more soft or tart wine. We see that the highest rating was for wines with a pH level between 3.0 to 3.5 and a level of volatile.acidity less than 0.8, mostly less than 0.6.
+
+------
+
+
+# Reflection
+
+The dataset of RedWineQuality was very interesting to explore. Maybe it would have been helpful to have more variables since some of the given variables didn't seem to have much impact. But this was a first exploration, so out of this a second and third one could follow up. One of the struggles I had were to find a trend out of the data, because in some plots it seems there have been more than one result and so it was not always easy to interpreted the data for the next step. Although some plots were easy going. As expected the quality level was the highest for the medium wine_rating. Maybe this is also some kind of social desirability as it maybe was not always easy to determine if one wine was better than the other. Some interesting future work to follow up with could include the comparision between red and white wines. Are there different ratings in total and which wine is highly preferred - white wine or red wine? Further interesting questions would be for the region of the wine or which grapes have been used. Also which age and sex were the participants who rated the wine, is there a preference of white or red wine for one sex or age or both. Also if female and/or male participants drink wine more often or just occasionally. It must also be consideres that not everyone has a lot of experience to rate a wine and it's taste/flavor etc.
+
